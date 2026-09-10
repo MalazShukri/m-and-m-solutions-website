@@ -10,12 +10,15 @@ const ICONS = [MessageCircle, Instagram, MapPin, Tag, Clock]
 
 // Scatter origins as a fraction of the container's half-width/half-height, so
 // the ring scales with the device panel instead of with each pill's own box.
+// Fractions above 1 sit outside the device's own box on purpose: the pills
+// should ring the device, not land on its screen. The positive side stays
+// under +0.6 because that edge is also the viewport edge.
 const ORIGINS = [
-  { fx: -0.62, fy: -0.72 },
-  { fx: 0.4, fy: -0.88 },
-  { fx: -0.72, fy: 0.3 },
-  { fx: 0.46, fy: 0.68 },
-  { fx: -0.04, fy: 0.92 },
+  { fx: -1.0, fy: -0.5 },
+  { fx: 0.55, fy: -0.95 },
+  { fx: -0.9, fy: 0.66 },
+  { fx: 0.58, fy: 0.74 },
+  { fx: -0.18, fy: -1.08 },
 ]
 
 type Props = {

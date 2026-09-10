@@ -46,7 +46,7 @@ export default function Hero() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         style={{ y: deviceY }}
-        className="absolute bottom-0 end-0 w-full lg:w-[64%] h-[48vh] md:h-[58vh] lg:h-[74vh] z-0"
+        className="absolute bottom-[8vh] end-0 w-full lg:w-[58%] h-[40vh] md:h-[48vh] lg:h-[58vh] z-0"
       >
         <div className="hero-glow" aria-hidden="true" />
         <DeviceScene className="absolute inset-0" />
@@ -135,8 +135,11 @@ export default function Hero() {
 
           </motion.div>
         </div>
+      </div>
 
-        <div className="hidden md:flex w-full justify-center mt-14">
+      {/* Sibling of the section, not the content column, so bottom-8 anchors to
+          the viewport-height hero rather than to the copy block. */}
+      <div className="hidden md:flex w-full justify-center absolute inset-x-0 bottom-8 z-10">
           <button
             type="button"
             onClick={(e) => handleScroll(e, "about")}
@@ -148,8 +151,7 @@ export default function Hero() {
               animate={prefersReducedMotion ? undefined : { y: [0, 22, 0] }}
               transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
             />
-          </button>
-        </div>
+        </button>
       </div>
     </section>
   )
