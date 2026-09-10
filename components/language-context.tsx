@@ -14,23 +14,18 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  // Always starts "en" so the server render and the first client render agree.
+  // The stored preference is applied after mount, which keeps hydration stable
+  // without withholding the page — returning null here would ship an empty
+  // document to crawlers, and this site sells search visibility.
   const [language, setLanguage] = useState<Language>("en")
-  const [mounted, setMounted] = useState(false)
 
-  // Avoid hydration mismatch
   useEffect(() => {
-    setMounted(true)
-
-    // Check if there's a saved language preference
     const savedLanguage = localStorage.getItem("language") as Language
-    if (savedLanguage && (savedLanguage === "en" || savedLanguage === "ar")) {
+    if (savedLanguage === "en" || savedLanguage === "ar") {
       setLanguage(savedLanguage)
-
-      // Apply RTL direction for Arabic
-      if (savedLanguage === "ar") {
-        document.documentElement.dir = "rtl"
-        document.documentElement.lang = "ar"
-      }
+      document.documentElement.dir = savedLanguage === "ar" ? "rtl" : "ltr"
+      document.documentElement.lang = savedLanguage
     }
   }, [])
 
@@ -43,9 +38,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.dir = newLanguage === "ar" ? "rtl" : "ltr"
     document.documentElement.lang = newLanguage
   }
-
-  // Only render children after mounting to avoid hydration issues
-  if (!mounted) return null
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, toggleLanguage }}>{children}</LanguageContext.Provider>

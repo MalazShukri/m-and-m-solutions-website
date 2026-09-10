@@ -6,7 +6,7 @@ import dynamic from "next/dynamic"
 import { useRef } from "react"
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Globe, Database } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { FaWhatsapp } from "react-icons/fa"
 import MessageConverge from "./message-converge"
 import { useLanguage } from "./language-context"
@@ -15,9 +15,9 @@ import { scrollToSection } from "@/lib/scroll"
 
 const DeviceScene = dynamic(() => import("./device-scene"), { ssr: false })
 
-const PILLAR_ICONS = [Globe, Database]
-// "automation" pillar intentionally excluded — see translations.ts hero.pillars comment
-const PILLAR_KEYS = ["web", "erp"] as const
+
+
+
 
 export default function Hero() {
   const { language } = useLanguage()
@@ -38,8 +38,23 @@ export default function Hero() {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen overflow-hidden pt-28 pb-16 md:pt-32 md:pb-20">
-      <div className="console-content container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-14 items-center">
+      {/* The 3D scene is the stage, not a column — it fills the lower half of
+          the viewport and the copy sits over it, so the device reads as the
+          hero rather than as an illustration beside the text. */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        style={{ y: deviceY }}
+        className="absolute bottom-0 end-0 w-full lg:w-[64%] h-[48vh] md:h-[58vh] lg:h-[74vh] z-0"
+      >
+        <div className="hero-glow" aria-hidden="true" />
+        <DeviceScene className="absolute inset-0" />
+        <MessageConverge progress={scrollYProgress} />
+      </motion.div>
+
+      <div className="console-content container mx-auto px-4 relative z-10">
+        <div className="max-w-3xl">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -118,39 +133,6 @@ export default function Hero() {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-6 max-w-md">
-              {PILLAR_KEYS.map((key, i) => {
-                const Icon = PILLAR_ICONS[i]
-                const pillar = t.hero.pillars[key]
-                return (
-                  <motion.div
-                    key={key}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.15 + i * 0.08, ease: "easeOut" }}
-                    className="console-panel console-panel-glow p-4"
-                  >
-                    <div className="chip mb-3">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="text-sm font-semibold text-foreground mb-1">{pillar.title}</h3>
-                    <p className="text-xs text-muted-console leading-relaxed">{pillar.description}</p>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            style={{ y: deviceY }}
-            className="relative h-[320px] sm:h-[420px] lg:h-[480px]"
-          >
-            <div className="hero-glow" aria-hidden="true" />
-            <DeviceScene className="absolute inset-0" />
-            <MessageConverge progress={scrollYProgress} />
           </motion.div>
         </div>
 
