@@ -3,7 +3,6 @@ import "./globals.css"
 import type { Metadata, Viewport } from "next"
 import { Space_Grotesk, Space_Mono, Cairo } from "next/font/google"
 import { LanguageProvider } from "@/components/language-context"
-import { Toaster } from "@/components/ui/toaster"
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -59,10 +58,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/favicon.png" />
       </head>
       <body>
-        <LanguageProvider>
-          {children}
-          <Toaster />
-        </LanguageProvider>
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   )
