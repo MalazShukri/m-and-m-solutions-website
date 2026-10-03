@@ -44,6 +44,14 @@ export default function DeviceScene({ className }: { className?: string }) {
     const camera = new THREE.PerspectiveCamera(38, mount.clientWidth / mount.clientHeight, 0.1, 100)
     camera.position.set(0, 0.2, 6.4)
 
+    // Both devices span roughly ±2.9 units across; on narrow (portrait-ish)
+    // boxes pull the camera back so the phone isn't cropped off the side.
+    const halfFovTan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
+    function fitCamera() {
+      camera.position.z = Math.max(6.4, 2.9 / (halfFovTan * camera.aspect))
+    }
+    fitCamera()
+
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setSize(mount.clientWidth, mount.clientHeight)
@@ -125,6 +133,7 @@ export default function DeviceScene({ className }: { className?: string }) {
     function handleResize() {
       if (!mount) return
       camera.aspect = mount.clientWidth / mount.clientHeight
+      fitCamera()
       camera.updateProjectionMatrix()
       renderer.setSize(mount.clientWidth, mount.clientHeight)
     }

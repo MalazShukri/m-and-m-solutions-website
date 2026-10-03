@@ -38,21 +38,6 @@ export default function Hero() {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen overflow-hidden pt-28 pb-16 md:pt-32 md:pb-20">
-      {/* The 3D scene is the stage, not a column — it fills the lower half of
-          the viewport and the copy sits over it, so the device reads as the
-          hero rather than as an illustration beside the text. */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.94 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        style={{ y: deviceY }}
-        className="absolute bottom-[8vh] end-0 w-full lg:w-[58%] h-[40vh] md:h-[48vh] lg:h-[58vh] z-0"
-      >
-        <div className="hero-glow" aria-hidden="true" />
-        <DeviceScene className="absolute inset-0" />
-        <MessageConverge progress={scrollYProgress} />
-      </motion.div>
-
       <div className="console-content container mx-auto px-4 relative z-10">
         <div className="max-w-3xl">
           <motion.div
@@ -137,9 +122,23 @@ export default function Hero() {
         </div>
       </div>
 
+      {/* Below xl the copy needs the full width, so the scene stacks under it;
+          from xl up it becomes the stage beside the copy. */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        style={{ y: deviceY }}
+        className="relative mx-auto mt-10 w-full max-w-3xl h-[300px] sm:h-[380px] md:h-[440px] z-0 xl:absolute xl:mt-0 xl:max-w-none xl:bottom-[10vh] xl:end-0 xl:w-[50%] xl:h-[58vh] 2xl:w-[54%]"
+      >
+        <div className="hero-glow" aria-hidden="true" />
+        <DeviceScene className="absolute inset-0" />
+        <MessageConverge progress={scrollYProgress} />
+      </motion.div>
+
       {/* Sibling of the section, not the content column, so bottom-8 anchors to
           the viewport-height hero rather than to the copy block. */}
-      <div className="hidden md:flex w-full justify-center absolute inset-x-0 bottom-8 z-10">
+      <div className="hidden xl:flex w-full justify-center absolute inset-x-0 bottom-8 z-10">
           <button
             type="button"
             onClick={(e) => handleScroll(e, "about")}

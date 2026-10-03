@@ -8,18 +8,18 @@ import { translations } from "./translations"
 
 const ICONS = [MessageCircle, Instagram, MapPin, Tag, Clock]
 
-// Scatter origins as a fraction of the container's half-width/half-height, so
-// the ring scales with the device panel instead of with each pill's own box.
-// Fractions above 1 sit outside the device's own box on purpose: the pills
-// should ring the device, not land on its screen. The positive side stays
-// under +0.6 because that edge is also the viewport edge.
+// Scatter origins as a fraction of the container's half-width/half-height.
+// Final positions are clamped so every pill stays fully inside the container.
 const ORIGINS = [
-  { fx: -1.0, fy: -0.5 },
-  { fx: 0.55, fy: -0.95 },
-  { fx: -0.9, fy: 0.66 },
-  { fx: 0.58, fy: 0.74 },
-  { fx: -0.18, fy: -1.08 },
+  { fx: -0.95, fy: -0.62 },
+  { fx: 0.95, fy: -0.9 },
+  { fx: -0.85, fy: 0.85 },
+  { fx: 0.9, fy: 0.9 },
+  { fx: 0.05, fy: -0.98 },
 ]
+
+const EDGE_GAP = 10
+const NARROW_WIDTH = 520
 
 type Props = {
   /** Hero scroll progress, 0 at rest → 1 when the hero has scrolled away. */
@@ -53,7 +53,7 @@ export default function MessageConverge({ progress }: Props) {
   return (
     <div ref={containerRef} className="absolute inset-0 pointer-events-none z-10" aria-hidden="true">
       {size.w > 0 &&
-        t.hero.fragments.map((fragment, i) => (
+        t.hero.fragments.slice(0, size.w < NARROW_WIDTH ? 4 : undefined).map((fragment, i) => (
           <Fragment
             key={fragment}
             index={i}
@@ -82,9 +82,19 @@ function Fragment({
 }) {
   const Icon = ICONS[index]
   const origin = ORIGINS[index]
+  const pillRef = useRef<HTMLDivElement>(null)
+  const [pill, setPill] = useState({ w: 0, h: 0 })
 
-  const fromX = (origin.fx * size.w) / 2
-  const fromY = (origin.fy * size.h) / 2
+  useEffect(() => {
+    const el = pillRef.current
+    if (el) setPill({ w: el.offsetWidth, h: el.offsetHeight })
+  }, [label, size.w, size.h])
+
+  const maxX = Math.max(0, size.w / 2 - pill.w / 2 - EDGE_GAP)
+  const maxY = Math.max(0, size.h / 2 - pill.h / 2 - EDGE_GAP)
+  const clamp = (v: number, m: number) => Math.min(m, Math.max(-m, v))
+  const fromX = clamp((origin.fx * size.w) / 2, maxX)
+  const fromY = clamp((origin.fy * size.h) / 2, maxY)
 
   // Each pill travels from its scattered origin to dead centre, shrinking and
   // fading as the device absorbs it. Staggered ends so they don't land at once.
@@ -103,14 +113,19 @@ function Fragment({
       }
       className="absolute left-1/2 top-1/2 -ms-px"
     >
+      {/* Centering lives on a plain wrapper: framer-motion's inline transform
+          on the floating element would otherwise wipe out the translate. */}
+      <div className="-translate-x-1/2 -translate-y-1/2">
       <motion.div
+        ref={pillRef}
         animate={still ? undefined : { y: [0, -7, 0] }}
         transition={{ duration: 3.4 + index * 0.4, repeat: Infinity, ease: "easeInOut" }}
-        className="flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-white/20 bg-[rgba(18,24,64,0.78)] px-3.5 py-2 backdrop-blur-md shadow-[0_8px_24px_-10px_rgba(0,0,0,0.85)]"
+        className="flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/20 bg-[rgba(18,24,64,0.78)] px-2.5 py-1.5 sm:px-3.5 sm:py-2 backdrop-blur-md shadow-[0_8px_24px_-10px_rgba(0,0,0,0.85)]"
       >
-        <Icon className="h-3.5 w-3.5 text-brand-light shrink-0" />
-        <span className="text-xs font-medium text-foreground/85 whitespace-nowrap">{label}</span>
+        <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand-light shrink-0" />
+        <span className="text-[11px] sm:text-xs font-medium text-foreground/85 whitespace-nowrap">{label}</span>
       </motion.div>
+      </div>
     </motion.div>
   )
 }
