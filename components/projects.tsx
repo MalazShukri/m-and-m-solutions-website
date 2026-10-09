@@ -208,7 +208,7 @@ export default function Projects() {
               className="console-panel console-panel-glow mt-8 max-w-2xl mx-auto p-6 md:p-8 text-center relative"
             >
               {activeIsLive && (
-                <span className="badge-live absolute top-4 end-4">
+                <span className="badge-live mb-3 md:mb-0 md:absolute md:top-4 md:end-4">
                   <span className="badge-live-dot" />
                   {language === "en" ? "Live" : "منفّذ"}
                 </span>

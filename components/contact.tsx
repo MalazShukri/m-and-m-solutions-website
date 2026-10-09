@@ -60,7 +60,7 @@ export default function Contact() {
             <a
               href={`tel:+${WHATSAPP_NUMBER}`}
               dir="ltr"
-              className="inline-tap inline-flex items-center gap-2 text-lg font-semibold tracking-wide text-foreground hover:text-brand-light transition-colors tabular-nums"
+              className="inline-flex min-h-[44px] items-center gap-2 text-lg font-semibold tracking-wide text-foreground hover:text-brand-light transition-colors tabular-nums"
             >
               <Phone className="h-4 w-4 shrink-0 text-brand-light" />
               {WHATSAPP_DISPLAY}
